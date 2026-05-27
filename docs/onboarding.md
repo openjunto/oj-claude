@@ -16,7 +16,9 @@ You should see a banner on stderr before the first prompt:
 OpenJunto v<version> active — OpenJunto coordination system
 ```
 
-If you don't see it, the `SessionStart` hook didn't fire. Check that the plugin loaded (`claude --plugin-dir /path/to/oj-claude`, or confirm `oj` appears in `/plugin`). OpenJunto is designed to degrade gracefully — the absence of the banner means the hook didn't run, not that Claude is broken.
+The banner is printed by the `SessionStart` hook, which fires on session start — startup, resume, `/clear`, or compaction. It does **not** fire on `/reload-plugins` or `/plugin reload`, so if you just reloaded the plugin, start a new session (or `/clear`) to see it. `<version>` comes from the plugin's `VERSION` file.
+
+If you still don't see it on a fresh session, the hook didn't fire. Check that the plugin loaded (`claude --plugin-dir /path/to/oj-claude`, or confirm `oj` appears in `/plugin`). OpenJunto is designed to degrade gracefully — the absence of the banner means the hook didn't run, not that Claude is broken.
 
 ## 2. Your First Task
 

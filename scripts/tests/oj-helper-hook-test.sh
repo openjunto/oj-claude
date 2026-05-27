@@ -117,6 +117,7 @@ scenario_s1_positive() {
     local T; T=$(mktemp -d -t oj-hook-s1-XXXXXX); trap 'rm -rf "$T"' EXIT
     mkdir -p "$T/home" "$T/plugin" "$T/data" "$T/xdg"
     printf '# Conductor\n\nTest content.\n' > "$T/plugin/CONDUCTOR.md"
+    printf '7.8.9\n' > "$T/plugin/VERSION"
 
     run_isolated "$T" conductor-inject
 
@@ -142,6 +143,19 @@ scenario_s1_positive() {
         assert_one "S1 conductor-inject positive: additionalContext byte-identical to CONDUCTOR.md" "ok"
     else
         assert_one "S1 conductor-inject positive: additionalContext byte-identical to CONDUCTOR.md" "fail" "expected=[$expected] actual=[$actual]"
+    fi
+
+    # SessionStart version banner: exact text with the resolved plugin
+    # version interpolated, on stderr only (must not appear in stdout).
+    if grep -qF "OpenJunto v7.8.9 active — OpenJunto coordination system" "$T/stderr"; then
+        assert_one "S1 conductor-inject positive: version banner on stderr with resolved version" "ok"
+    else
+        assert_one "S1 conductor-inject positive: version banner on stderr with resolved version" "fail" "stderr=$(cat "$T/stderr")"
+    fi
+    if ! grep -qF "active — OpenJunto coordination system" "$T/stdout"; then
+        assert_one "S1 conductor-inject positive: banner does not leak into stdout" "ok"
+    else
+        assert_one "S1 conductor-inject positive: banner does not leak into stdout" "fail" "stdout=$(cat "$T/stdout")"
     fi
 
     rm -rf "$T"; trap - EXIT
@@ -213,7 +227,12 @@ scenario_s3_adversarial() {
 }
 
 # ────────────────────────────────────────────────────────────────────
-# S4 — empty CONDUCTOR.md: valid JSON, empty body, no stderr warning
+# S4 — empty CONDUCTOR.md: valid JSON, empty body, version banner on
+# stderr, but NO CONDUCTOR advisory (empty file is a legitimate
+# adopter "protocol intentionally disabled" state — we must not warn
+# about it). The SessionStart version banner still fires on every
+# conductor-inject path, so stderr is NOT empty here; the contract is
+# specifically the absence of the CONDUCTOR-missing/disabled warning.
 # ────────────────────────────────────────────────────────────────────
 scenario_s4_empty() {
     local T; T=$(mktemp -d -t oj-hook-s4-XXXXXX); trap 'rm -rf "$T"' EXIT
@@ -231,11 +250,21 @@ scenario_s4_empty() {
         assert_one "S4 empty CONDUCTOR: additionalContext == \"\"" "fail" "stdout=$(cat "$T/stdout")"
     fi
 
-    # No stderr warning — empty file is a legitimate state
-    if [ ! -s "$T/stderr" ]; then
-        assert_one "S4 empty CONDUCTOR: stderr is empty (no warning)" "ok"
+    # Version banner fires on every conductor-inject path (SessionStart
+    # active confirmation) — assert it is present on stderr.
+    if grep -qF "active — OpenJunto coordination system" "$T/stderr"; then
+        assert_one "S4 empty CONDUCTOR: version banner present on stderr" "ok"
     else
-        assert_one "S4 empty CONDUCTOR: stderr is empty (no warning)" "fail" "stderr=$(cat "$T/stderr")"
+        assert_one "S4 empty CONDUCTOR: version banner present on stderr" "fail" "stderr=$(cat "$T/stderr")"
+    fi
+
+    # No CONDUCTOR advisory — empty file is a legitimate "disabled"
+    # state, so the CONDUCTOR-missing warning must NOT appear. (The
+    # banner above is an active signal, not a warning.)
+    if ! grep -qF "${OJ_STDERR_CONDUCTOR_MISSING}" "$T/stderr"; then
+        assert_one "S4 empty CONDUCTOR: no CONDUCTOR advisory (disabled state stays silent)" "ok"
+    else
+        assert_one "S4 empty CONDUCTOR: no CONDUCTOR advisory (disabled state stays silent)" "fail" "stderr=$(cat "$T/stderr")"
     fi
 
     rm -rf "$T"; trap - EXIT

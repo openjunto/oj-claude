@@ -30,6 +30,35 @@ debug() {
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 # ────────────────────────────────────────────────────────────────────
+# _oj_plugin_version — resolve the plugin version string
+# ────────────────────────────────────────────────────────────────────
+# Reads the version from VERSION at the plugin root. Resolution mirrors
+# _conductor_resolve_path: prefer ${CLAUDE_PLUGIN_ROOT}/VERSION, fall back
+# to script-relative ../VERSION for non-plugin-host invocations (the bin/
+# symlink in local dev). Falls back to "unknown" rather than failing —
+# the banner and sentinel writes are more important than version capture.
+#
+# The Makefile-era ~/.claude/.oj-version file is intentionally NOT read:
+# that artifact belongs to the pre-plugin install era and is what
+# migrate-legacy detects + cleans up.
+_oj_plugin_version() {
+  local v="unknown"
+  local version_file
+  if [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]]; then
+    version_file="${CLAUDE_PLUGIN_ROOT}/VERSION"
+  else
+    local script_dir
+    script_dir=$(dirname "$(readlink -f "$0" 2>/dev/null || echo "$0")")
+    version_file="${script_dir}/../VERSION"
+  fi
+  if [[ -r "$version_file" ]]; then
+    v=$(head -1 "$version_file" | tr -d '[:space:]')
+    [[ -n "$v" ]] || v="unknown"
+  fi
+  echo "$v"
+}
+
+# ────────────────────────────────────────────────────────────────────
 # inject-profile — SubagentStart hook: inject expert profile context
 # ────────────────────────────────────────────────────────────────────
 # Reads SubagentStart hook JSON from stdin. Identifies the expert role
@@ -221,7 +250,25 @@ _conductor_emit_empty_json() {
   echo '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":""}}'
 }
 
+_conductor_emit_banner() {
+  # Version banner confirming OpenJunto is active. MUST go to stderr
+  # only: the SessionStart hook's stdout carries the JSON additionalContext
+  # payload, and any stray stdout byte would corrupt it. The banner text
+  # is a stable, user-facing string — keep it byte-identical to the spec
+  # (F16-architecture.md § SessionStart Hook). The em-dash is intentional.
+  #
+  # Banner emission is independent of CONDUCTOR.md state: it fires on
+  # every conductor-inject path (including missing jq / missing CONDUCTOR)
+  # so adopters always get the "active" confirmation. jq is NOT required.
+  echo "OpenJunto v$(_oj_plugin_version) active — OpenJunto coordination system" >&2
+}
+
 cmd_conductor_inject() {
+  # Emit the version banner first, to stderr only, so it confirms
+  # OpenJunto is active regardless of which (possibly degraded) JSON path
+  # below runs. Never touches stdout — stdout is the JSON envelope.
+  _conductor_emit_banner
+
   # jq is required for safe JSON encoding of arbitrary CONDUCTOR.md
   # contents. Without jq we cannot guarantee proper escaping, so we
   # emit a hardcoded empty envelope and an actionable stderr message
@@ -320,23 +367,10 @@ _migrate_iso8601_utc() {
 }
 
 _migrate_plugin_version() {
-  # Read the plugin version from VERSION at the plugin root. Fall back
-  # to "unknown" rather than die — sentinel write is more important
-  # than version capture.
-  local v="unknown"
-  local version_file
-  if [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]]; then
-    version_file="${CLAUDE_PLUGIN_ROOT}/VERSION"
-  else
-    local script_dir
-    script_dir=$(dirname "$(readlink -f "$0" 2>/dev/null || echo "$0")")
-    version_file="${script_dir}/../VERSION"
-  fi
-  if [[ -r "$version_file" ]]; then
-    v=$(head -1 "$version_file" | tr -d '[:space:]')
-    [[ -n "$v" ]] || v="unknown"
-  fi
-  echo "$v"
+  # Thin alias for the shared _oj_plugin_version helper. Retained so the
+  # migrate-legacy section reads self-contained; both resolve VERSION at
+  # the plugin root with an "unknown" fallback.
+  _oj_plugin_version
 }
 
 _migrate_build_sentinel() {

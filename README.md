@@ -11,18 +11,20 @@ OpenJunto ships as a Claude Code plugin — no build step. Install it from the m
 /plugin install oj@openjunto
 ```
 
-Then run `/reload-plugins` (or restart Claude Code). To iterate on the plugin locally without installing it, load the working tree directly:
+Then start a new Claude Code session (restart, or `/clear`) to load the plugin. To iterate on the plugin locally without installing it, load the working tree directly:
 
 ```bash
 git clone https://github.com/openjunto/oj-claude.git
 claude --plugin-dir ./oj-claude
 ```
 
-After reload (or on the next session start), you should see a banner on stderr:
+On the next session start, you should see a banner on stderr:
 
 ```
 OpenJunto v<version> active — OpenJunto coordination system
 ```
+
+The banner is printed by the `SessionStart` hook, so it appears on session start (startup, resume, `/clear`, compaction) — not on `/reload-plugins` or `/plugin reload`. After a reload, start a new session to see it. `<version>` comes from this repo's `VERSION` file.
 
 ## Usage
 
