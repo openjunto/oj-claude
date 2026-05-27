@@ -1,0 +1,9 @@
+{
+  "name": "openjunto",
+  "owner": {
+    "name": "openjunto"
+  },
+  "plugins": [
+    { "name": "oj", "source": "./" }
+  ]
+}
