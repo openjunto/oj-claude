@@ -22,10 +22,10 @@ If you still don't see it on a fresh session, the hook didn't fire. Check that t
 
 ## 2. Your First Task
 
-Start with something where multi-perspective review adds obvious value. Paste this:
+Start with something where multi-perspective review adds obvious value. Run:
 
 ```
-Review this file for security issues: src/auth/token_validator.go
+/oj:cycle Review this file for security issues: src/auth/token_validator.go
 ```
 
 ### What you should see

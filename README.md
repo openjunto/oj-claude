@@ -28,13 +28,13 @@ The banner is printed by the `SessionStart` hook, so it appears on session start
 
 ## Usage
 
-OpenJunto activates automatically — just describe the work in plain language.
+The manager protocol loads at session start. Put OpenJunto to work by invoking a coordinated cycle with `/oj:cycle <what you want done>` (or `/oj:run-task` for a backlog item):
 
-- `Review this pull request for security issues.`
-- `Fix the flaky test in auth_service_test.go.`
-- `Evaluate whether we should migrate from REST to gRPC for internal services.`
+- `/oj:cycle Review this pull request for security issues.`
+- `/oj:cycle Fix the flaky test in auth_service_test.go.`
+- `/oj:cycle Evaluate whether we should migrate from REST to gRPC for internal services.`
 
-The Manager handles triage, expert selection, peer review, and quality gates transparently. You do not need to invoke experts by name.
+The Manager handles triage, expert selection, peer review, and quality gates. You don't invoke experts by name — the Manager selects them.
 
 ## What's Included
 
