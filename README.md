@@ -4,20 +4,21 @@ A Claude Code configuration that transforms the AI into a coordinated team of 16
 
 ## Quickstart
 
-OpenJunto ships as a Claude Code plugin. The plugin host installs the plugin when you opt in — there is no separate build step.
+OpenJunto ships as a Claude Code plugin — no build step. Install it from the marketplace inside a Claude Code session:
+
+```
+/plugin marketplace add openjunto/oj-claude
+/plugin install oj@openjunto
+```
+
+Then run `/reload-plugins` (or restart Claude Code). To iterate on the plugin locally without installing it, load the working tree directly:
 
 ```bash
 git clone https://github.com/openjunto/oj-claude.git
 claude --plugin-dir ./oj-claude
 ```
 
-When the OpenJunto marketplace publishes, installation becomes:
-
-```bash
-claude plugin install oj@openjunto
-```
-
-Start Claude Code. You should see a banner on stderr:
+After reload (or on the next session start), you should see a banner on stderr:
 
 ```
 OpenJunto v<version> active — OpenJunto coordination system
