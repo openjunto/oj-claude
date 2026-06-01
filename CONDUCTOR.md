@@ -284,7 +284,7 @@ You are a [Expert Role Name].
 
 The `<!-- oj-expert: ... -->` marker tells the hook which profile to inject. Use the profile filename without extension (e.g., `senior-software-engineer`, `senior-distinguished-engineer`). The hook injects `_preamble.md` + the full profile as `additionalContext`.
 
-**Context inheritance**: Sub-agents automatically inherit the user-global `CLAUDE.md` and the project-local `.claude/CLAUDE.md` as `<system-reminder>` context. They do NOT inherit conversation history or session state. No additional context injection is needed for standard protocol compliance.
+**Context inheritance**: Sub-agents automatically inherit the user-global `CLAUDE.md` and the project-local `./CLAUDE.md` as `<system-reminder>` context. They do NOT inherit conversation history or session state. No additional context injection is needed for standard protocol compliance.
 
 **Fallback**: If the hook is unavailable (e.g., `oj-helper` not in PATH, `jq` missing, or profile not found), the expert receives no injected profile. In that case, add self-loading instructions to the spawn prompt:
 
@@ -426,4 +426,4 @@ Never accept an agent's claim of "done" without verification.
 
 ### Incorporating Lessons
 
-**Update .claude/CLAUDE.md when**: pattern repeats 2-3 times, OR high-severity (security/data loss), AND fix is a clear actionable rule. **Don't update for**: one-time errors, common sense, or duplicate guidance. Most lessons don't need persisting.
+**Update ./CLAUDE.md when**: pattern repeats 2-3 times, OR high-severity (security/data loss), AND fix is a clear actionable rule. **Don't update for**: one-time errors, common sense, or duplicate guidance. Most lessons don't need persisting.
