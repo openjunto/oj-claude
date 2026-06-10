@@ -30,7 +30,7 @@ The banner is printed by the `SessionStart` hook, so it appears on session start
 
 The manager protocol loads at session start. Put OpenJunto to work by invoking a coordinated cycle with `/oj:cycle <what you want done>` (or `/oj:run-task` for a backlog item):
 
-- `/oj:cycle Review this pull request for security issues.`
+- `/oj:cycle I'm adding rate limiting to the public REST API of our Node/Express auth service. Expected ~10,000 requests per minute, with one Redis instance available. What should I think about before implementing?`
 - `/oj:cycle Fix the flaky test in auth_service_test.go.`
 - `/oj:cycle Evaluate whether we should migrate from REST to gRPC for internal services.`
 

@@ -22,19 +22,19 @@ If you still don't see it on a fresh session, the hook didn't fire. Check that t
 
 ## 2. Your First Task
 
-Start with something where multi-perspective review adds obvious value. Run:
+Start with something where multi-perspective review adds obvious value. You've probably already considered Redis vs. memcache, token bucket vs. sliding window, and where the middleware sits. The point of this walkthrough isn't to teach rate limiting — it's to surface the less obvious failure modes that show up when four expert lenses examine the same problem in parallel. Run:
 
 ```
-/oj:cycle Review this file for security issues: src/auth/token_validator.go
+/oj:cycle I'm adding rate limiting to the public REST API of our Node/Express auth service. Expected ~10,000 requests per minute, with one Redis instance available. What should I think about before implementing?
 ```
 
 ### What you should see
 
-1. **Triage declaration.** The Manager opens with an explicit triage: execution model (expect **Moderate**) and a stakeholder list (expect **Product Manager + Distinguished Engineer + Security Engineer**).
+1. **Triage declaration.** The Manager opens with an explicit triage: execution model (expect **Moderate**) and a stakeholder list (expect **Product Manager + Distinguished Engineer + Security Engineer + DevOps Engineer**).
 2. **Parallel sub-agent spawns.** In Phase 1, you should see Task tool invocations fire in parallel — one per stakeholder. They run concurrently; the Manager does not wait between them.
 3. **FINDING / TENSION ledger in synthesis.** Between Phase 1 and Phase 2, the Manager consolidates stakeholder output into a ledger. `FINDING` lines are agreed-upon observations. `TENSION` lines are productive disagreements that get *forwarded* to the implementer — not resolved by the Manager.
 4. **STRONGEST OBJECTION per handback.** Every handback includes a STRONGEST OBJECTION field — the best argument *against* that expert's own recommendation. If it reads as boilerplate, call it out.
-5. **Dissenting views preserved.** The final synthesis surfaces dissent rather than papering over it. If two stakeholders disagreed, the answer should name the disagreement and say which path was taken and why.
+5. **Dissenting views preserved.** The final synthesis surfaces dissent rather than papering over it. If two stakeholders disagreed, the answer should name the disagreement and say which path was taken and why — for example, disagreement may look like fail-closed vs. fail-open on a Redis outage, or distributed vs. local enforcement.
 
 Typical wall-clock for a Moderate-tier task: **4–8 minutes**.
 
