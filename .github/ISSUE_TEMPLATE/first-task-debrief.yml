@@ -1,0 +1,98 @@
+name: First-task debrief
+description: Brief debrief after completing (or attempting) the canned first task — takes under 5 minutes.
+labels: ["adopter-debrief"]
+title: "[Debrief] First-task run"
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for running the canned first task. This form captures your raw impressions so we can make Phase 1 → Phase 2 decisions on real signal rather than silence. Terms like STRONGEST OBJECTION are defined in [docs/onboarding.md](https://github.com/openjunto/oj-claude/blob/main/docs/onboarding.md).
+
+  - type: dropdown
+    id: completion-status
+    attributes:
+      label: How did the run go?
+      description: Abandonment is first-class signal, not an error state.
+      options:
+        - Completed
+        - Abandoned partway
+        - "Couldn't start"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: triage-tier
+    attributes:
+      label: Which triage tier did the Manager declare?
+      options:
+        - Simple
+        - Moderate
+        - Complex
+        - Don't remember
+    validations:
+      required: false
+
+  - type: dropdown
+    id: expert-disagreement
+    attributes:
+      label: Did the experts genuinely disagree?
+      description: "e.g. a real tension like fail-open vs fail-closed on a Redis outage, distributed vs local enforcement"
+      options:
+        - "Yes, authentic disagreement"
+        - Felt scripted
+        - No disagreement seen
+    validations:
+      required: false
+
+  - type: dropdown
+    id: strongest-objection
+    attributes:
+      label: Was any STRONGEST OBJECTION non-boilerplate?
+      options:
+        - "Yes"
+        - Boilerplate
+        - Didn't see one
+    validations:
+      required: false
+
+  - type: dropdown
+    id: wall-clock
+    attributes:
+      label: Rough wall-clock time for the run
+      options:
+        - "< 4 min"
+        - 4–8 min
+        - 8–15 min
+        - "> 15 min"
+        - Didn't finish
+    validations:
+      required: false
+
+  - type: textarea
+    id: friction
+    attributes:
+      label: Friction or confusion
+      description: Name the specific moment if you can.
+      placeholder: "Optional — skip if nothing stood out."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: use-on-real-work
+    attributes:
+      label: Would you run this on real work this week?
+      options:
+        - "Yes"
+        - Maybe
+        - "No"
+    validations:
+      required: false
+
+  - type: textarea
+    id: anything-else
+    attributes:
+      label: Anything else?
+      placeholder: "Optional."
+    validations:
+      required: false
